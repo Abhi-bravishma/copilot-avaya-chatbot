@@ -489,8 +489,7 @@ export class ChatComponent {
         // this.socket.emit('message', this.chatListT0Agent);
         this.ws.close();
         this.isAvaya = true;
-
-        
+        this.sendInitialMessageAvaya();
       }
 
       setTimeout(() => {
@@ -727,5 +726,14 @@ export class ChatComponent {
     return fu;
   }
 
-  
+  sendInitialMessageAvaya() {
+    let messagePayload: Message = {
+      sender: this.sender,
+      userType: UserType.Customer,
+      message_type: MessageType.Text,
+      text: 'hi',
+    };
+    // this.sendMessageToAgent(messagePayload);
+    this.socket.emit('message', messagePayload);
+  }
 }
