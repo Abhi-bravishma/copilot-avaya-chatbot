@@ -132,6 +132,7 @@ export class ChatComponent {
   messsFile = MessageType.File;
   messageType: typeof MessageType = MessageType;
   actionType: typeof ActionType = ActionType;
+  isAvaya: boolean = false;
 
   messageTypeText: MessageType.Text | undefined;
   messageTypeImage: MessageType.Image | undefined;
@@ -158,7 +159,13 @@ export class ChatComponent {
     //socket of connecter
 
     this.socket.on('connect', () => {
-      console.log('connected to server');
+      console.log('avaya connector socket connection established successfully');
+    });
+
+    this.socket.on('disconnect', () => {
+      console.log(
+        'avaya connector socket connection un-established successfully'
+      );
     });
 
     this.socket.on('message', (data: Message) => {
@@ -397,14 +404,14 @@ export class ChatComponent {
     // const eventData = JSON.parse(event.data);
     this.ws.onmessage = (event) => {
       // console.log('Received message:', event);
-      console.log(
-        'Received message:'
-        // JSON.stringify(JSON.parse(event.data)['activities'][0].text)
-      );
+      // console.log(
+      //   'Received message:'
+      //   // JSON.stringify(JSON.parse(event.data)['activities'][0].text)
+      // );
 
       // this.chatList.push(JSON.parse(event.data)['activities'][0]);
       let eventData = event.data ? JSON.parse(event.data) : null;
-      // console.log('eventData', eventData);
+      console.log('eventData', eventData);
 
       if (eventData && eventData?.activities[0]?.attachments?.length > 0) {
         let acData = eventData?.activities[0]?.attachments[0];
@@ -431,12 +438,26 @@ export class ChatComponent {
         acData.html = renderedCard?.innerHTML;
       }
 
-      eventData && this.chatList.push(eventData?.activities[0]);
+      // eventData && this.chatList.push(eventData?.activities[0]);
+      if (eventData && eventData?.activities[0]?.type === 'message') {
+        let dataa = eventData.activities[0];
+        console.log('what the fmsg--> ', dataa);
+        let serializeData: Message = this.serializeCopilotData(dataa);
+        console.log('serializeData--> ', serializeData);
+        this.chatMessages.push(serializeData);
+      }
 
       if (
         eventData?.activities[0].type === 'event' &&
         eventData?.activities[0].value === 'connectToAgent'
       ) {
+        console.log(
+          'wtf--> ',
+          eventData?.activities[0].type,
+          ' ----- ',
+          eventData?.activities[0].value
+        );
+        // this.sendText();
         //   this.chatListT0Agent.push(eventData?.activities[0].from);
         //   console.log('connectToAgentUrl', this.chatListT0Agent)
         //  ;
@@ -465,8 +486,11 @@ export class ChatComponent {
           });
         console.log('chatListT0Agent', this.chatListT0Agent);
 
-        this.socket.emit('message', this.chatListT0Agent);
+        // this.socket.emit('message', this.chatListT0Agent);
         this.ws.close();
+        this.isAvaya = true;
+
+        
       }
 
       setTimeout(() => {
@@ -478,7 +502,7 @@ export class ChatComponent {
       // 909572fe-96ba-43a4-87d3-e05abe0a8545
       // 909572fe-96ba-43a4-87d3-e05abe0a8545
 
-      console.log('fu-=> ', this.chatList);
+      // console.log('fu-=> ', this.chatList);
 
       eventData?.activities[0]?.suggestedActions?.actions?.map((ele: any) => {
         console.log('🧐', ele.value);
@@ -486,9 +510,9 @@ export class ChatComponent {
           ele.value
         );
       });
-      eventData?.activities[0]?.suggestedActions?.actions?.map((ele: any) =>
-        console.log('🧐', ele.type)
-      );
+      // eventData?.activities[0]?.suggestedActions?.actions?.map((ele: any) =>
+      //   console.log('🧐', ele.type)
+      // );
 
       const message = eventData?.activities[0]?.attachments[0]?.content;
       if (message?.images && message?.images.length > 0) {
@@ -554,32 +578,40 @@ export class ChatComponent {
       const message = value;
       console.log('mess============> here ', message);
       if (message !== '') {
-        if (this.ws.readyState === WebSocket.OPEN) {
-          this.ws.send(message);
-
+        // if (this.ws.readyState === WebSocket.OPEN) {
+        // this.ws.send(message);
+        if (!this.isAvaya) {
           this.sendMessageAgain(this.conversionDetails, message);
         } else {
-          console.warn('WebSocket connection not open. Cannot send message.');
           this.sendText();
         }
+        // } else {
+        //   console.warn('WebSocket connection not open. Cannot send message.');
+        //   this.sendText();
+        // }
         // message = '';
         this.messageInputText.nativeElement.value &&
           (this.messageInputText.nativeElement.value = '');
-        this.actionsContainer && ( this.actionsContainer.nativeElement.style.display = 'none');
-        this.actionsContainer &&  this.actionsContainer.nativeElement.remove(  );
+        this.actionsContainer &&
+          (this.actionsContainer.nativeElement.style.display = 'none');
+        this.actionsContainer && this.actionsContainer.nativeElement.remove();
       }
     } else {
       const message = this.messageInputText.nativeElement.value;
       console.log('mess============> there ', message);
       if (message !== '') {
-        if (this.ws.readyState === WebSocket.OPEN) {
-          this.ws.send(message);
-
+        // if (this.ws.readyState === WebSocket.OPEN) {
+        // this.ws.send(message);
+        if (!this.isAvaya) {
           this.sendMessageAgain(this.conversionDetails, message);
         } else {
-          console.warn('WebSocket connection not open. Cannot send message.');
           this.sendText();
         }
+
+        // } else {
+        //   console.warn('WebSocket connection not open. Cannot send message.');
+        //   this.sendText();
+        // }
         // message = '';
         this.messageInputText.nativeElement.value &&
           (this.messageInputText.nativeElement.value = '');
@@ -612,7 +644,7 @@ export class ChatComponent {
 
   async sendMessageAgain(conversionDetails: any, message: string) {
     const { conversationId, streamUrl, token } = conversionDetails;
-    // console.log(conversionDetails)
+    console.log('conversionDetails');
     let headersList = {
       authority: 'directline.botframework.com',
       accept: '*/*',
@@ -681,4 +713,19 @@ export class ChatComponent {
       console.log('error in send initial message', error);
     }
   }
+
+  serializeCopilotData(data: any) {
+    let userType =
+      data.from.role === 'user' ? UserType.Customer : UserType.System;
+    let fu: Message = {
+      sender: userType,
+      userType: userType,
+      message_type: MessageType.Text,
+      text: data.text,
+    };
+
+    return fu;
+  }
+
+  
 }
