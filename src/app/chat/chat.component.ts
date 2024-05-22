@@ -125,7 +125,7 @@ export class ChatComponent {
   count: number = 0;
   hasSubmittedRating = false;
   chatMessages: Message[] = [];
-  sender: string = 'kamlesh';
+  sender: string = 'USER';
   typeUser = UserType.Customer;
   typeAgent = UserType.Agent;
   typeSystem = UserType.System;
