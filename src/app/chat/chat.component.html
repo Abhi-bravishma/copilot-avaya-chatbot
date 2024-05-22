@@ -22,150 +22,158 @@
   </div>
 
   <!-- <div class="chat-messages"  style="overflow-anchor: none;"> -->
-  <div class="chat-messages" #messageContainer >
-    <ng-container *ngIf="chatMessages.length > 0;else chatListTemplate " >
-    <div class="ll" *ngFor="let msg of chatMessages; index as i">
-      <div
-        class="message"
-        [ngClass]="{
-          bot: msg.userType === typeAgent || msg.userType === typeSystem,
-          user: msg.userType === typeUser,
-          anchor: chatMessages.length === i + 1
-        }"
-      >
-        <img
-          *ngIf="msg.userType === typeAgent || msg.userType === typeSystem"
-          src="./assets/chat-logo.png"
-          class="profile-image bot"
-          [ngClass]="{bot: msg.userType === typeAgent || msg.userType===typeSystem,}"
-          style="
-            height: 25px;
-            width: 25px;
-            margin-bottom: 4px;
-            margin-right: 5px;
-            border-radius: 12px;
-          "
-        />
-
-        <img
-          *ngIf="msg.userType === typeUser"
-          src="./assets/user-logo.svg"
-          class="profile-image user"
-          [ngClass]="{user: msg.userType === typeUser,}"
-          style="height: 25px; width: 25px; margin-bottom: 4px"
-        />
-
+  <div class="chat-messages" #messageContainer>
+    <ng-container *ngIf="chatMessages.length > 0; else chatListTemplate">
+      <div class="ll" *ngFor="let msg of chatMessages; index as i">
         <div
-          class="message-content"
+          class="message"
           [ngClass]="{
+            bot: msg.userType === typeAgent || msg.userType === typeSystem,
+            user: msg.userType === typeUser,
+            anchor: chatMessages.length === i + 1
+          }"
+        >
+          <img
+            *ngIf="msg.userType === typeAgent || msg.userType === typeSystem"
+            src="./assets/chat-logo.png"
+            class="profile-image bot"
+            [ngClass]="{bot: msg.userType === typeAgent || msg.userType===typeSystem,}"
+            style="
+              height: 25px;
+              width: 25px;
+              margin-bottom: 4px;
+              margin-right: 5px;
+              border-radius: 12px;
+            "
+          />
+
+          <img
+            *ngIf="msg.userType === typeUser"
+            src="./assets/user-logo.svg"
+            class="profile-image user"
+            [ngClass]="{user: msg.userType === typeUser,}"
+            style="height: 25px; width: 25px; margin-bottom: 4px"
+          />
+
+          <div
+            class="message-content"
+            [ngClass]="{
             botcol: msg.userType === typeAgent || msg.userType === typeSystem,
             cus: msg.userType === typeUser,
             file: msg.message_type === messsFile,
           }"
-        >
-          <!-- <div
+          >
+            <!-- <div
             class="message-text"
             *ngIf="msg.type === 'message' && msg.attachments?.length > 0"
             [innerHTML]="getSafeHtml(msg.attachments[0].html)"
             (click)="onRatingSubmitted($event?.target)"
           ></div> -->
-          <!--  div for if text only-->
-          <div
-            class="message-text"
-            *ngIf="msg.message_type === messageTypeText"
-            [innerHTML]="msg.text"
-          ></div>
-          <div
-            class=""
-            style="position: relative"
-            *ngIf="msg.message_type === messageTypeImage"
-          >
-            <img style="width: 100%; height: 50px" [src]="msg" />
-          </div>
-          <div
-            class=""
-            style="position: relative"
-            *ngIf="msg.message_type === messageTypeVideo"
-          >
-            <video
-              controls
-              style="width: 100%; height: 100%px"
-              [src]="msg.video"
-            ></video>
-          </div>
-
-          <div *ngIf="msg.message_type === messageType.Text">
-            {{ msg.text }}
-            <div *ngIf="msg.actions">
-              <span *ngFor="let action of msg.actions">
-                <span *ngIf="action.type === actionType.LocationRequest">
-                  <button class="location-btn" (click)="handleSendLocation()">
-                    {{ action.text }}
-                  </button>
-                </span>
-              </span>
+            <!--  div for if text only-->
+            <div
+              class="message-text"
+              *ngIf="msg.message_type === messageTypeText"
+              [innerHTML]="msg.text"
+            ></div>
+            <div
+              class=""
+              style="position: relative"
+              *ngIf="msg.message_type === messageTypeImage"
+            >
+              <img style="width: 100%; height: 50px" [src]="msg" />
             </div>
-          </div>
-          <div *ngIf="msg.message_type === messageType.Image">
-            <img
-              style="width: 100%; height: 50px"
-              [src]="msg.userType === typeUser ? msg.image.data : msg.image.url"
-            />
-          </div>
-          <div *ngIf="msg.message_type === messageType.Audio">
-            <audio
-              controls
-              [src]="msg.userType === typeUser ? msg.audio.data : msg.audio.url"
-            ></audio>
-          </div>
-          <div *ngIf="msg.message_type === messageType.Video">
-            <video
-              controls
-              style="width: 100%; height: 100%px"
-              [src]="msg.userType === typeUser ? msg.video.data : msg.video.url"
-            ></video>
-          </div>
-          <div
-            class="file-container"
-            *ngIf="msg.message_type === messageType.File"
-          >
-            <img
-              style="height: 20px; margin-right: 4px"
-              src="./assets/pdf.png"
-              alt=""
-            />
-            <a
-              style="
-                text-decoration: none !important;
-                color: black;
-                display: flex;
-              "
-              [href]="msg.userType === typeUser ? msg.file.data : msg.file.url"
-              [download]="msg.file.name"
-              >{{ msg.file.name }}
-              <span
-                ><img
-                  alt="Download"
-                  style="height: 20px; margin-left: 4px"
-                  src="./assets/download.png"
-                  alt="" /></span
-            ></a>
-          </div>
-          <div *ngIf="msg.message_type === messageType.Location">
-            <!-- <strong>location : </strong>
+            <div
+              class=""
+              style="position: relative"
+              *ngIf="msg.message_type === messageTypeVideo"
+            >
+              <video
+                controls
+                style="width: 100%; height: 100%px"
+                [src]="msg.video"
+              ></video>
+            </div>
+
+            <div *ngIf="msg.message_type === messageType.Text">
+              {{ msg.text }}
+              <div *ngIf="msg.actions">
+                <span *ngFor="let action of msg.actions">
+                  <span *ngIf="action.type === actionType.LocationRequest">
+                    <button class="location-btn" (click)="handleSendLocation()">
+                      {{ action.text }}
+                    </button>
+                  </span>
+                </span>
+              </div>
+            </div>
+            <div *ngIf="msg.message_type === messageType.Image">
+              <img
+                style="width: 100%; height: 50px"
+                [src]="
+                  msg.userType === typeUser ? msg.image.data : msg.image.url
+                "
+              />
+            </div>
+            <div *ngIf="msg.message_type === messageType.Audio">
+              <audio
+                controls
+                [src]="
+                  msg.userType === typeUser ? msg.audio.data : msg.audio.url
+                "
+              ></audio>
+            </div>
+            <div *ngIf="msg.message_type === messageType.Video">
+              <video
+                controls
+                style="width: 100%; height: 100%px"
+                [src]="
+                  msg.userType === typeUser ? msg.video.data : msg.video.url
+                "
+              ></video>
+            </div>
+            <div
+              class="file-container"
+              *ngIf="msg.message_type === messageType.File"
+            >
+              <img
+                style="height: 20px; margin-right: 4px"
+                src="./assets/pdf.png"
+                alt=""
+              />
+              <a
+                style="
+                  text-decoration: none !important;
+                  color: black;
+                  display: flex;
+                "
+                [href]="
+                  msg.userType === typeUser ? msg.file.data : msg.file.url
+                "
+                [download]="msg.file.name"
+                >{{ msg.file.name }}
+                <span
+                  ><img
+                    alt="Download"
+                    style="height: 20px; margin-left: 4px"
+                    src="./assets/download.png"
+                    alt="" /></span
+              ></a>
+            </div>
+            <div *ngIf="msg.message_type === messageType.Location">
+              <!-- <strong>location : </strong>
             Latitude : {{msg.location.lat}} , Longitude : {{msg.location.long}} -->
-            <!-- https://www.latlong.net/c/?lat=18.5855998&long=73.7830746 -->
-            <!-- <a
+              <!-- https://www.latlong.net/c/?lat=18.5855998&long=73.7830746 -->
+              <!-- <a
               href="https://www.latlong.net/c/?lat={{
                 msg.location.lat
               }}&long={{ msg.location.long }}"
               target="_blank"
               >location</a
             > -->
-            <iframe [src]="msg.location.url"></iframe>
-          </div>
+              <iframe [src]="msg.location.url"></iframe>
+            </div>
 
-          <!-- <div [ngSwitch]="msg.message_type">
+            <!-- <div [ngSwitch]="msg.message_type">
             <div *ngSwitchCase="messageType.Text">text</div>
             <div *ngSwitchCase="messageType.Image">Image</div>
             <div *ngSwitchCase="messageType.Audio">Audio</div>
@@ -174,10 +182,10 @@
             <div *ngSwitchCase="messageType.Location">Location</div>
             <div *ngSwitchDefault>wtf</div>
           </div> -->
+          </div>
         </div>
       </div>
-    </div>
-</ng-container>
+    </ng-container>
     <ng-template #chatListTemplate>
       <div class="ll" *ngFor="let msg of chatList; index as i">
         <div
@@ -194,7 +202,7 @@
           user: msg.from.role === 'user',
     
         }" > -->
-  
+
           <img
             *ngIf="msg.from.role === 'bot'"
             src="./assets/chat-logo.png"
@@ -208,7 +216,7 @@
               border-radius: 12px;
             "
           />
-  
+
           <img
             *ngIf="msg.from.role === 'user' && !msg.value"
             src="./assets/user-logo.svg"
@@ -216,7 +224,7 @@
             [ngClass]="{user: msg.from.role === 'user',}"
             style="height: 25px; width: 25px; margin-bottom: 4px"
           />
-  
+
           <div
             *ngIf="!msg.value"
             class="message-content"
@@ -231,8 +239,8 @@
               class="message-text"
               *ngIf="msg.type === 'message' && msg.attachments?.length > 0"
               [innerHTML]="getSafeHtml(msg.attachments[0].html)"
-              ></div>
-              <!-- (click)="onRatingSubmitted($event?.target)" -->
+            ></div>
+            <!-- (click)="onRatingSubmitted($event?.target)" -->
             <!--  div for if text only-->
             <div
               class="message-text"
@@ -244,7 +252,8 @@
               class=""
               style="position: relative"
               *ngIf="
-                msg.attachments?.length > 0 || msg.attachmentLayout === 'carousel'
+                msg.attachments?.length > 0 ||
+                msg.attachmentLayout === 'carousel'
               "
             >
               <button
@@ -270,7 +279,7 @@
                 </button>
               </div>
             </div>
-  
+
             <!--  div for if timestamp-->
             <div
               class="message-time"
@@ -282,7 +291,7 @@
               {{ msg.timestamp | date : "hh:mm a" }}
             </div>
           </div>
-  
+
           <!-- <div
             class="message-content"
             [ngClass]="{
@@ -306,8 +315,8 @@
             </div>
           </div> -->
         </div>
-    <!-- <button (click)="king()">king</button> -->
-  
+        <!-- <button (click)="king()">king</button> -->
+
         <!-- div for suggeested actins -->
         <div
           class="suggestedActionsContainer"
@@ -323,15 +332,13 @@
               />
             </button>
           </div> -->
-  
+
           <!-- style="background: red; height: 100px; width: 100px" -->
           <div *ngFor="let action of msg.suggestedActions.actions">
             <button
               class="suggestedActionsContainer-btn"
               *ngIf="action.type !== 'openUrl'; else elseBlock"
-              (click)="
-                sendMessage(action.value)
-              "
+              (click)="sendMessage(action.value)"
             >
               {{ action.text || action.value }}
             </button>
@@ -343,7 +350,7 @@
               </button>
             </ng-template>
           </div>
-  
+
           <!-- <div class="scrollbuttons scroll-right">
             <button (click)="scrollRight()">
               <img
@@ -361,10 +368,7 @@
         ></div> -->
       </div>
     </ng-template>
-
   </div>
-
-
 
   <form (ngSubmit)="sendMessage()" class="chat-input">
     <div
@@ -386,7 +390,12 @@
         (input)="updateInputSize($event)"
         
       />-->
-      <button for="fileInput" class="fileInput" style="" (click)="fileInput.click()">
+      <button
+        for="fileInput"
+        class="fileInput"
+        style=""
+        (click)="fileInput.click()"
+      >
         <span
           class="material-symbols-outlined attachfile"
           style="color: #adacac"
@@ -407,8 +416,8 @@
         (input)="updateInputSize($event)"
         (input)="onInput($event)"
         (keydown)="handleEnterPress($event)"
-        ></textarea>
-        <!-- (keydown)="handleEnterPress($event)" -->
+      ></textarea>
+      <!-- (keydown)="handleEnterPress($event)" -->
       <!-- [ngStyle]="{ 'height.px': inputSize }" -->
 
       <!-- <span style="" class="sendBten"> -->
@@ -434,13 +443,7 @@
         style=""
         [ngClass]="{ 'typing-text': isTyping }"
       >
-        <span
-          style=""
-          class="material-symbols-outlined send-icn"
-        
-        >
-          send
-        </span>
+        <span style="" class="material-symbols-outlined send-icn"> send </span>
       </button>
       <!-- </span> -->
     </div>
