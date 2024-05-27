@@ -3,9 +3,7 @@
 <div *ngIf="showChatbot" class="chat-container" [@popupAnimation]>
   <!-- <div class="chat-container"> -->
   <div class="chat-header" style="box-shadow: 0 0 10px white">
-    <p style="flex: 1; text-align: center; align-items: center">
-     Avaya
-    </p>
+    <p style="flex: 1; text-align: center; align-items: center">Avaya</p>
     <!-- <span style="position: absolute; right: 19px; bottom: 11px">
       <app-geolocation
         style="margin-right: 70px; margin-bottom: 10px"
@@ -23,7 +21,8 @@
 
   <!-- <div class="chat-messages"  style="overflow-anchor: none;"> -->
   <div class="chat-messages" #messageContainer>
-    <ng-container *ngIf="chatMessages.length > 0; else chatListTemplate">
+    <!-- <ng-container *ngIf="chatMessages.length > 0; else chatListTemplate"> -->
+    <ng-container *ngIf="chatMessages.length > 0">
       <div class="ll" *ngFor="let msg of chatMessages; index as i">
         <div
           class="message"
@@ -95,7 +94,7 @@
             </div>
 
             <div *ngIf="msg.message_type === messageType.Text">
-              {{ msg.text }}
+              <div class="message-text" [innerHTML]="msg.text"></div>
               <div *ngIf="msg.actions">
                 <span *ngFor="let action of msg.actions">
                   <span *ngIf="action.type === actionType.LocationRequest">
@@ -104,6 +103,26 @@
                     </button>
                   </span>
                 </span>
+              </div>
+
+              <div
+                class="suggestedActionsContainer"
+                *ngIf="msg.suggestedActions"
+                #suggestedActionsContainer
+                id="suggestedActionsContainer"
+              >
+                <!-- <div
+                  *ngFor="let action of msg.suggestedActions.actions"
+                  class="suggestedActionCont"
+                > -->
+                <button
+                  *ngFor="let action of msg.suggestedActions.actions"
+                  class="suggestedActionsContainer-btn"
+                  (click)="sendMessage(action.value)"
+                >
+                  {{ action.text || action.value }}
+                </button>
+                <!-- </div> -->
               </div>
             </div>
             <div *ngIf="msg.message_type === messageType.Image">
@@ -130,6 +149,7 @@
                   msg.userType === typeUser ? msg.video.data : msg.video.url
                 "
               ></video>
+             
             </div>
             <div
               class="file-container"
@@ -170,204 +190,91 @@
               target="_blank"
               >location</a
             > -->
-              <iframe [src]="msg.location.url"></iframe>
+              <!-- <iframe [src]="msg.location.url"></iframe> -->
+              <div ><a [href]="msg.location.url"></a></div>
             </div>
-
-            <!-- <div [ngSwitch]="msg.message_type">
-            <div *ngSwitchCase="messageType.Text">text</div>
-            <div *ngSwitchCase="messageType.Image">Image</div>
-            <div *ngSwitchCase="messageType.Audio">Audio</div>
-            <div *ngSwitchCase="messageType.Video">Video</div>
-            <div *ngSwitchCase="messageType.File">File</div>
-            <div *ngSwitchCase="messageType.Location">Location</div>
-            <div *ngSwitchDefault>wtf</div>
-          </div> -->
-          </div>
-        </div>
-      </div>
-    </ng-container>
-    <ng-template #chatListTemplate>
-      <div class="ll" *ngFor="let msg of chatList; index as i">
-        <div
-          *ngIf="msg.type !== 'typing' && msg.type !== 'event'"
-          class="message"
-          [ngClass]="{
-            bot: msg.from.role === 'bot',
-            user: msg.from.role === 'user',
-            anchor: chatList.length === i + 1
-          }"
-        >
-          <!-- <img [src]="getUserImage()" class="profile-image"  *ngIf="msg.type.from === '' && msg.type !== 'event'" [ngClass]="{
-        
-          user: msg.from.role === 'user',
-    
-        }" > -->
-
-          <img
-            *ngIf="msg.from.role === 'bot'"
-            src="./assets/chat-logo.png"
-            class="profile-image bot"
-            [ngClass]="{bot: msg.from.role === 'bot',}"
-            style="
-              height: 25px;
-              width: 25px;
-              margin-bottom: 4px;
-              margin-right: 5px;
-              border-radius: 12px;
-            "
-          />
-
-          <img
-            *ngIf="msg.from.role === 'user' && !msg.value"
-            src="./assets/user-logo.svg"
-            class="profile-image user"
-            [ngClass]="{user: msg.from.role === 'user',}"
-            style="height: 25px; width: 25px; margin-bottom: 4px"
-          />
-
-          <div
-            *ngIf="!msg.value"
-            class="message-content"
-            [ngClass]="{
-              botcol: msg.from.role === 'bot',
-              cus: msg.from.role === 'user'
-            }"
-          >
-            <!-- <div class="message-text" [innerHTML]="msg.text"></div> -->
-            <!--  div for if attachment is there-->
-            <div
-              class="message-text"
-              *ngIf="msg.type === 'message' && msg.attachments?.length > 0"
-              [innerHTML]="getSafeHtml(msg.attachments[0].html)"
-            ></div>
-            <!-- (click)="onRatingSubmitted($event?.target)" -->
-            <!--  div for if text only-->
-            <div
-              class="message-text"
-              *ngIf="msg.type === 'message'"
-              [innerHTML]="msg.text"
-            ></div>
-            <!--  div for if iamge is there-->
-            <div
-              class=""
-              style="position: relative"
-              *ngIf="
-                msg.attachments?.length > 0 ||
-                msg.attachmentLayout === 'carousel'
-              "
-            >
-              <button
-                *ngIf="msg.attachmentLayout === 'carousel'"
-                class="prev"
-                (click)="scrollPrev()"
-                alt=""
+            <div *ngIf="msg.message_type === messageType.Copilot">
+              <div class="message-text" [innerHTML]="msg.text"></div>
+              <div
+                class="suggestedActionsContainer"
+                *ngIf="msg.suggestedActions"
+                #suggestedActionsContainer
+                id="suggestedActionsContainer"
               >
-                prev
-              </button>
-              <div class="carousel" #carouselContainer>
+                <button
+                  *ngFor="let action of msg.suggestedActions.actions"
+                  class="suggestedActionsContainer-btn"
+                  (click)="sendMessage(action.value)"
+                >
+                  {{ action.text || action.value }}
+                </button>
+                <!-- </div> -->
+              </div>
+              <div
+                *ngIf="msg.attachments && msg.attachmentLayout !== 'carousel'"
+              >
                 <div *ngFor="let attachment of msg.attachments">
                   <div *ngFor="let image of attachment.content.images">
                     <img style="width: 100%" [src]="image.url" />
                   </div>
+                  <strong><div class="title">{{attachment.content.title}}</div></strong>
+                  <div>{{attachment.content.text}}</div>
+                  <!-- <div *ngFor="let button of attachment.content.buttons" style="padding: 0 0.5rem;">
+                    <a [href]="button.value"><button style="width: 80%;margin-bottom: 5px; background: #28a0ff;padding: 0 0.5rem;
+                      color: white;
+                      border: none;
+                      cursor: pointer;">{{button.title}}</button></a>
+
+                  </div> -->
                 </div>
+              </div>
+              <div
+                class=""
+                style="position: relative"
+                *ngIf="msg.attachments && msg.attachmentLayout === 'carousel'"
+              >
                 <button
                   *ngIf="msg.attachmentLayout === 'carousel'"
-                  class="next"
-                  (click)="scrollNext()"
+                  class="prev"
+                  (click)="scrollPrev()"
+                  alt=""
                 >
-                  Next
+                  prev
                 </button>
+                <div class="carousel" #carouselContainer>
+                  <div *ngFor="let attachment of msg.attachments">
+                    <div *ngFor="let image of attachment.content.images">
+                      <img style="width: 100%" [src]="image.url" />
+                    </div>
+                  </div>
+                  <button
+                    *ngIf="msg.attachmentLayout === 'carousel'"
+                    class="next"
+                    (click)="scrollNext()"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+
+              <div *ngFor="let attachment of msg.attachments">
+                <div
+                  class="video"
+                  *ngIf="
+                    attachment.contentType;
+                    &quot;application/vnd.microsoft.card.video&quot;
+                  "
+                >
+                  <div *ngFor="let media of attachment.content.media">
+                    <video width="100%" controls [src]="media.url"></video>
+                  </div>
+                </div>
               </div>
             </div>
-
-            <!--  div for if timestamp-->
-            <div
-              class="message-time"
-              [ngClass]="{
-                botcol: msg.from.role === 'bot',
-                cus: msg.from.role === 'user'
-              }"
-            >
-              {{ msg.timestamp | date : "hh:mm a" }}
-            </div>
           </div>
-
-          <!-- <div
-            class="message-content"
-            [ngClass]="{
-              botcol: msg.from.role === 'bot',
-              cus: msg.from.role === 'user'
-            }"
-            *ngIf="msg.type === 'message' && msg.attachments?.length > 0"
-          >
-            <div
-              class="message-text"
-              [innerHTML]="getSafeHtml(msg.attachments[0].html)"
-            ></div>
-            <div 
-              class="message-time"
-              [ngClass]="{
-                botcol: msg.from.role === 'bot',
-                cus: msg.from.role === 'user'
-              }"
-            >
-              {{ msg.timestamp | date : "hh:mm a" }}
-            </div>
-          </div> -->
         </div>
-        <!-- <button (click)="king()">king</button> -->
-
-        <!-- div for suggeested actins -->
-        <div
-          class="suggestedActionsContainer"
-          *ngIf="msg.suggestedActions"
-          #suggestedActionsContainer
-        >
-          <!-- <div class="scrollbuttons scroll-left">
-            <button (click)="scrollLeft()">
-              <img
-                style="height: 16px"
-                src="./assets/scrollarrowtoleft_83879.png"
-                alt=""
-              />
-            </button>
-          </div> -->
-
-          <!-- style="background: red; height: 100px; width: 100px" -->
-          <div *ngFor="let action of msg.suggestedActions.actions">
-            <button
-              class="suggestedActionsContainer-btn"
-              *ngIf="action.type !== 'openUrl'; else elseBlock"
-              (click)="sendMessage(action.value)"
-            >
-              {{ action.text || action.value }}
-            </button>
-            <ng-template #elseBlock>
-              <button class="agent-link">
-                <a [href]="connectToAgentUrl" target="_blank">{{
-                  action.value
-                }}</a>
-              </button>
-            </ng-template>
-          </div>
-
-          <!-- <div class="scrollbuttons scroll-right">
-            <button (click)="scrollRight()">
-              <img
-                style="height: 16px"
-                src="./assets/right-arrowflat.png"
-                alt=""
-              />
-            </button>
-          </div> -->
-        </div>
-        <!-- <div
-          class="adptv-card"
-          *ngIf="msg.type === 'message' && msg.attachments?.length > 0"
-          [innerHTML]="getSafeHtml(msg.attachments[0].html)"
-        ></div> -->
       </div>
-    </ng-template>
+    </ng-container>
   </div>
 
   <form (ngSubmit)="sendMessage()" class="chat-input">

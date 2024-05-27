@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 
 import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
 import { ChatComponent } from './chat/chat.component';
+import { ConfigService } from './config.service';
 
 
 @Component({
@@ -19,7 +20,7 @@ export class AppComponent  {
   // socketUrl: any;
   // conversionDetails: any;
 
-  // constructor(private websocketService: CopiloServiceService) {}
+  // constructor(private tokenService: ConfigService) {}
   // async ngOnInit() {
   //   this.conversionDetails = await this.getSocketUrl();
   //   this.socketUrl = this.conversionDetails.streamUrl;

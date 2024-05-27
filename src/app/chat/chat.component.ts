@@ -20,7 +20,14 @@ import {
   LocationData,
   UserType,
   ActionType,
+  SuggestedAction,
+  CopilotAttachments,
+  CopilotAttachmentContent,
+  CopilotAttachmentButtons,
+  CopilotAttachmentContentImage,
+  CopilotAttachmentMedia,
 } from '../types/message';
+import { ConfigService } from '../config.service';
 
 // type User = 'user' | 'bot';
 
@@ -100,6 +107,7 @@ export class ChatComponent {
     return this.userImages;
   }
 
+  // modalImageUrl!: any;
   inputSize: number = 30;
   showChatbot: boolean = false;
   isTyping: boolean = false;
@@ -133,17 +141,23 @@ export class ChatComponent {
   messageType: typeof MessageType = MessageType;
   actionType: typeof ActionType = ActionType;
   isAvaya: boolean = false;
-
+  copilotConversationId: string = '';
   messageTypeText: MessageType.Text | undefined;
   messageTypeImage: MessageType.Image | undefined;
   messageTypeAudio: MessageType.Audio | undefined;
   messageTypeVideo: MessageType.Video | undefined;
   messageTypeFile: MessageType.File | undefined;
   messageTypeLocation: MessageType.Location | undefined;
-
+  messageTypeSuggestedAction: MessageType.SuggestedActions | undefined;
+  messageTypeCopilot: MessageType.Copilot | undefined;
+  copilotToken: any;
   lastMessage: { role: string; msg: string } | null = null;
 
-  constructor(private sanitzer: DomSanitizer, private socket: Socket) {}
+  constructor(
+    private sanitzer: DomSanitizer,
+    private socket: Socket,
+    private tokenService: ConfigService
+  ) {}
   receivedImage: any;
 
   getSafeHtml(html: string) {
@@ -151,7 +165,21 @@ export class ChatComponent {
   }
 
   async ngOnInit() {
-    this.conversionDetails = await this.getSocketUrl();
+    // this.tokenService.getToken().subscribe(
+    //   (data: any) => {
+    //     // Assuming the response has a 'token' field
+    //     console.log('Token:', data.copilotToken);
+    //     this.copilotToken = data.copilotToken;
+    //   },
+    //   (error: any) => {
+    //     console.error('Error fetching token:', error);
+    //   }
+    // );
+
+    let data = await this.tokenService.getToken().toPromise();
+    // console.log('tokenservice--------------------> ', data);
+
+    this.conversionDetails = await this.getSocketUrl(data.copilotToken);
     this.socketUrl = this.conversionDetails.streamUrl;
     this.constructWebSocketURL();
     this.startInactivityTimer();
@@ -173,9 +201,10 @@ export class ChatComponent {
       data.userType = UserType.Agent;
       console.log('avayaREsp--------> ', data);
       setTimeout(() => {
-        this.messageContainer.nativeElement.scrollTop =
-          this.messageContainer.nativeElement.scrollHeight -
-          this.messageContainer.nativeElement.clientHeight;
+        if (this.messageContainer)
+          this.messageContainer.nativeElement.scrollTop =
+            this.messageContainer.nativeElement.scrollHeight -
+            this.messageContainer.nativeElement.clientHeight;
       }, 1);
       this.chatMessages.push(data);
       console.log('-=-=-=', this.chatMessages);
@@ -265,6 +294,7 @@ export class ChatComponent {
             userType: UserType.Customer,
             message_type: MessageType.Image,
             [MessageType.Image]: fileData,
+            copilot_convo_id: this.copilotConversationId,
           };
           break;
         case 'audio':
@@ -273,6 +303,7 @@ export class ChatComponent {
             userType: UserType.Customer,
             message_type: MessageType.Audio,
             [MessageType.Audio]: fileData,
+            copilot_convo_id: this.copilotConversationId,
           };
           break;
         case 'video':
@@ -281,6 +312,7 @@ export class ChatComponent {
             userType: UserType.Customer,
             message_type: MessageType.Video,
             [MessageType.Video]: fileData,
+            copilot_convo_id: this.copilotConversationId,
           };
           break;
 
@@ -290,6 +322,7 @@ export class ChatComponent {
             userType: UserType.Customer,
             message_type: MessageType.File,
             [MessageType.File]: fileData,
+            copilot_convo_id: this.copilotConversationId,
           };
       }
       // console.log('messagePayload===> ', messagePayload);
@@ -306,6 +339,7 @@ export class ChatComponent {
       userType: UserType.Customer,
       message_type: MessageType.Text,
       text: this.messageInputText.nativeElement.value,
+      copilot_convo_id: this.copilotConversationId,
     };
     this.messageInputText.nativeElement.value = '';
 
@@ -349,6 +383,7 @@ export class ChatComponent {
           userType: UserType.Customer,
           message_type: MessageType.Location,
           [MessageType.Location]: loc,
+          copilot_convo_id: this.copilotConversationId,
         };
         this.sendMessageToAgent(messagePayload);
       },
@@ -411,7 +446,7 @@ export class ChatComponent {
 
       // this.chatList.push(JSON.parse(event.data)['activities'][0]);
       let eventData = event.data ? JSON.parse(event.data) : null;
-      console.log('eventData', eventData);
+      // console.log('eventData', eventData);
 
       if (eventData && eventData?.activities[0]?.attachments?.length > 0) {
         let acData = eventData?.activities[0]?.attachments[0];
@@ -493,9 +528,10 @@ export class ChatComponent {
       }
 
       setTimeout(() => {
-        this.messageContainer.nativeElement.scrollTop =
-          this.messageContainer.nativeElement.scrollHeight -
-          this.messageContainer.nativeElement.clientHeight;
+        if (this.messageContainer)
+          this.messageContainer.nativeElement.scrollTop =
+            this.messageContainer?.nativeElement.scrollHeight -
+            this.messageContainer?.nativeElement.clientHeight;
       }, 1);
 
       // 909572fe-96ba-43a4-87d3-e05abe0a8545
@@ -505,6 +541,7 @@ export class ChatComponent {
 
       eventData?.activities[0]?.suggestedActions?.actions?.map((ele: any) => {
         console.log('🧐', ele.value);
+
         this.connectToAgentUrl = this.sanitzer.bypassSecurityTrustResourceUrl(
           ele.value
         );
@@ -513,10 +550,10 @@ export class ChatComponent {
       //   console.log('🧐', ele.type)
       // );
 
-      const message = eventData?.activities[0]?.attachments[0]?.content;
+      const message = eventData?.activities?.[0]?.attachments?.[0]?.content;
       if (message?.images && message?.images.length > 0) {
         this.userImage = this.sanitzer.bypassSecurityTrustResourceUrl(
-          message.images[0]?.url
+          message?.images[0]?.url
         );
         console.log('image', this.userImage);
       }
@@ -591,8 +628,9 @@ export class ChatComponent {
         // message = '';
         this.messageInputText.nativeElement.value &&
           (this.messageInputText.nativeElement.value = '');
-        this.actionsContainer &&
-          (this.actionsContainer.nativeElement.style.display = 'none');
+        // this.actionsContainer
+        // &&
+        //   (this.actionsContainer.nativeElement.style.display = 'none');
         this.actionsContainer && this.actionsContainer.nativeElement.remove();
       }
     } else {
@@ -620,13 +658,18 @@ export class ChatComponent {
     }
   }
 
-  async getSocketUrl() {
+  async getSocketUrl(copilotToken: string) {
+    console.log('copilotToken ==> ', copilotToken);
     let headersList = {
       Accept: '*/*',
       Authorization:
         // 'Bearer nRkW9WSAFoY.qsrTi92ZljrPGQalhmW0ARz0fM7UKrdmiXefdnJw56s', // University Copilot (classic),
-        'Bearer 6mJ1ECPC0dk.hunFtodVEt72En-mSOwQiSLcBabsgjK_zwLVeAYq6U8', //University AI Copilot,
-      // 'Bearer NzJvp6uOnjk.5h8_Dmesn3A4geCI_7vBiCSIka6dKNT1EUcwQdTIarg',//campus bot
+        // 'Bearer mcKUYtZZ-5A.SNSxaE9Tb2FcLEtXhLAq-ISgM4LAwiH-dzaAvCAuTZA', //University AI Copilot,
+        // 'Bearer J4F_EVyzGL0.RJf4LF_6Oiue88wdXeYqSn9iWJg2f64LGVPsiG2QPxw', //beyond bank,
+
+        // 'Bearer 6mJ1ECPC0dk.hunFtodVEt72En-mSOwQiSLcBabsgjK_zwLVeAYq6U8', //University AI Copilot,
+
+        `Bearer ${copilotToken}`, //copy bot
     };
 
     let response = await fetch(
@@ -676,14 +719,16 @@ export class ChatComponent {
     );
 
     let data = await response.text();
-    console.log(data);
+    console.log('wtf', data);
   }
 
   //it is for the initial message which comes on opening
   async sendInitialMessege(conversionDetails: any) {
     try {
       const { conversationId, token } = conversionDetails;
-
+      if (conversationId) {
+        this.copilotConversationId = conversationId;
+      }
       let headersList = {
         authorization: `Bearer ${token}`,
         'content-type': 'application/json',
@@ -707,7 +752,7 @@ export class ChatComponent {
       );
 
       let data = await response.text();
-      console.log('inital msg send ', data);
+      // console.log('inital msg send ', data);
     } catch (error) {
       console.log('error in send initial message', error);
     }
@@ -716,11 +761,69 @@ export class ChatComponent {
   serializeCopilotData(data: any) {
     let userType =
       data.from.role === 'user' ? UserType.Customer : UserType.System;
+
+    // let suggestedActions: SuggestedAction={
+    //   text: da
+    // }
+
+    let attachments = data.attachments?.map(
+      (attachment: CopilotAttachments): CopilotAttachments => {
+        let buttons: CopilotAttachmentButtons[] =
+          attachment.content.buttons?.map(
+            (button: CopilotAttachmentButtons): CopilotAttachmentButtons => {
+              return {
+                type: button.type,
+                title: button.title,
+                value: button.value,
+              };
+            }
+          );
+
+        let images: CopilotAttachmentContentImage[] =
+          attachment.content.images?.map(
+            (
+              image: CopilotAttachmentContentImage
+            ): CopilotAttachmentContentImage => {
+              return {
+                url: image.url,
+              };
+            }
+          );
+        let video: CopilotAttachmentMedia[] = attachment.content.media?.map(
+          (video: CopilotAttachmentMedia): CopilotAttachmentMedia => {
+            return {
+              url: video.url,
+            };
+          }
+        );
+
+        let content: CopilotAttachmentContent = {
+          title: attachment.content.title,
+          subtitle: attachment.content.subtitle,
+          text: attachment.content.text,
+          buttons: buttons,
+          images: images,
+          media: video,
+        };
+
+        return {
+          contentType: attachment.contentType,
+          content: content,
+          html: attachment.html,
+        };
+      }
+    );
+
     let fu: Message = {
       sender: userType,
       userType: userType,
-      message_type: MessageType.Text,
-      text: data.text,
+      message_type: MessageType.Copilot,
+      copilot_convo_id: data.conversation.id,
+      text: data.text ? this.convertNewlinesToBreaks(data.text) : '',
+      timestamp: data.timestamp,
+      suggestedActions: data.suggestedActions,
+      attachments: attachments,
+      attachmentLayout: data.attachment,
     };
 
     return fu;
@@ -728,6 +831,7 @@ export class ChatComponent {
 
   sendInitialMessageAvaya() {
     let messagePayload: Message = {
+      copilot_convo_id: this.copilotConversationId,
       sender: this.sender,
       userType: UserType.Customer,
       message_type: MessageType.Text,
@@ -736,4 +840,20 @@ export class ChatComponent {
     // this.sendMessageToAgent(messagePayload);
     this.socket.emit('message', messagePayload);
   }
+
+  convertNewlinesToBreaks(text: string): string {
+    // console.log('text', text);
+    return   text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  }
+
+
+
+
+  // openModal(imageUrl: string) {
+  //   this.modalImageUrl = imageUrl;
+  // }
+
+  // closeModal() {
+  //   this.modalImageUrl = null;
+  // }
 }
