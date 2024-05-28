@@ -187,7 +187,8 @@ export class ChatComponent {
     //socket of connecter
 
     this.socket.on('connect', () => {
-      console.log('avaya connector socket connection established successfully');
+      console.log('avaya connector socket connection established successfully',this.socket.ioSocket.id);
+      
     });
 
     this.socket.on('disconnect', () => {
