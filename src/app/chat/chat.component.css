@@ -342,13 +342,13 @@ input {
     right: 0;
     position: fixed;
     flex-direction: column;
-    background: #c7c7f075;
+    /* background: #c7c7f075; */
     z-index: 9999;
   }
 }
 
 .drag-drop-container {
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.7rem;
   display: flex;
   flex-flow: row;
   gap: 0.5rem;
