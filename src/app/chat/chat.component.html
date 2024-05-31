@@ -33,7 +33,7 @@
           }"
         >
           <img
-            *ngIf="msg.userType === typeAgent || msg.userType === typeSystem"
+            *ngIf="msg.userType === typeSystem"
             src="./assets/chat-logo.png"
             class="profile-image bot"
             [ngClass]="{bot: msg.userType === typeAgent || msg.userType===typeSystem,}"
@@ -45,6 +45,41 @@
               border-radius: 12px;
             "
           />
+
+          <!-- <img
+            *ngIf="msg.userType === typeAgent "
+            src="./assets/Avaya_"
+            class="profile-image bot"
+            [ngClass]="{bot: msg.userType === typeAgent || msg.userType===typeSystem,}"
+            style="
+              height: 25px;
+              width: 25px;
+              margin-bottom: 4px;
+              margin-right: 5px;
+              border-radius: 12px;
+            "
+          /> -->
+
+          <div
+            *ngIf="msg.userType === typeAgent"
+            src="./assets/Avaya_"
+            class="profile-image bot"
+            [ngClass]="{bot: msg.userType === typeAgent || msg.userType===typeSystem,}"
+            style="
+              height: 25px;
+              width: 25px;
+              margin-bottom: 4px;
+              margin-right: 5px;
+              border-radius: 12px;
+            "
+          >
+            <span
+              class="material-symbols-outlined"
+              style="color: black; background: none"
+            >
+              support_agent
+            </span>
+          </div>
 
           <img
             *ngIf="msg.userType === typeUser"
@@ -72,7 +107,6 @@
             <div
               class="message-text"
               *ngIf="msg.message_type === messageTypeText"
-              [innerHTML]="msg.text"
             ></div>
             <div
               class=""
@@ -95,7 +129,7 @@
 
             <div *ngIf="msg.message_type === messageType.Text">
               <div class="message-text" [innerHTML]="msg.text"></div>
-              
+
               <div *ngIf="msg.actions">
                 <span *ngFor="let action of msg.actions">
                   <span *ngIf="action.type === actionType.LocationRequest">
@@ -150,7 +184,6 @@
                   msg.userType === typeUser ? msg.video.data : msg.video.url
                 "
               ></video>
-             
             </div>
             <div
               class="file-container"
@@ -192,10 +225,11 @@
               >location</a
             > -->
               <!-- <iframe [src]="msg.location.url"></iframe> -->
-              <div ><a [href]="msg.location.url"></a></div>
+              <div><a [href]="msg.location.url"></a></div>
             </div>
             <div *ngIf="msg.message_type === messageType.Copilot">
               <div class="message-text" [innerHTML]="msg.text"></div>
+
               <div
                 class="suggestedActionsContainer"
                 *ngIf="msg.suggestedActions"
@@ -218,8 +252,12 @@
                   <div *ngFor="let image of attachment.content.images">
                     <img style="width: 100%" [src]="image.url" />
                   </div>
-                  <strong><div class="title">{{attachment.content.title}}</div></strong>
-                  <div>{{attachment.content.text}}</div>
+                  <strong
+                    ><div class="title">
+                      {{ attachment.content.title }}
+                    </div></strong
+                  >
+                  <div>{{ attachment.content.text }}</div>
                   <!-- <div *ngFor="let button of attachment.content.buttons" style="padding: 0 0.5rem;">
                     <a [href]="button.value"><button style="width: 80%;margin-bottom: 5px; background: #28a0ff;padding: 0 0.5rem;
                       color: white;
@@ -257,7 +295,15 @@
                   </button>
                 </div>
               </div>
-
+              <!-- <div
+                class="message-time"
+                [ngClass]="{
+            botcol:msg.userType === typeAgent || msg.userType === typeSystem,
+            cus: msg.userType === typeUser,
+          }"
+              >
+                {{ msg.timestamp | date : "hh:mm a" }}
+              </div> -->
               <div *ngFor="let attachment of msg.attachments">
                 <div
                   class="video"
@@ -272,7 +318,15 @@
                 </div>
               </div>
             </div>
-            
+            <div
+              class="message-time"
+              [ngClass]="{
+        botcol:msg.userType === typeAgent || msg.userType === typeSystem,
+        cus: msg.userType === typeUser,
+      }"
+            >
+              {{ msg.timestamp | date : "hh:mm a" }}
+            </div>
           </div>
         </div>
       </div>

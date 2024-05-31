@@ -49,6 +49,7 @@ interface BaseMessage {
   userType: UserType;
   message_type: MessageType;
   copilot_convo_id: string;
+  timestamp: string;
 }
 
 interface TextMessage extends BaseMessage {

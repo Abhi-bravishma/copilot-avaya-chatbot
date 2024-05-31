@@ -187,8 +187,10 @@ export class ChatComponent {
     //socket of connecter
 
     this.socket.on('connect', () => {
-      console.log('avaya connector socket connection established successfully',this.socket.ioSocket.id);
-      
+      console.log(
+        'avaya connector socket connection established successfully',
+        this.socket.ioSocket.id
+      );
     });
 
     this.socket.on('disconnect', () => {
@@ -296,6 +298,7 @@ export class ChatComponent {
             message_type: MessageType.Image,
             [MessageType.Image]: fileData,
             copilot_convo_id: this.copilotConversationId,
+            timestamp: new Date().toISOString(),
           };
           break;
         case 'audio':
@@ -305,6 +308,7 @@ export class ChatComponent {
             message_type: MessageType.Audio,
             [MessageType.Audio]: fileData,
             copilot_convo_id: this.copilotConversationId,
+            timestamp: new Date().toISOString(),
           };
           break;
         case 'video':
@@ -314,6 +318,7 @@ export class ChatComponent {
             message_type: MessageType.Video,
             [MessageType.Video]: fileData,
             copilot_convo_id: this.copilotConversationId,
+            timestamp: new Date().toISOString(),
           };
           break;
 
@@ -324,6 +329,7 @@ export class ChatComponent {
             message_type: MessageType.File,
             [MessageType.File]: fileData,
             copilot_convo_id: this.copilotConversationId,
+            timestamp: new Date().toISOString(),
           };
       }
       // console.log('messagePayload===> ', messagePayload);
@@ -341,6 +347,7 @@ export class ChatComponent {
       message_type: MessageType.Text,
       text: this.messageInputText.nativeElement.value,
       copilot_convo_id: this.copilotConversationId,
+      timestamp: new Date().toISOString(),
     };
     this.messageInputText.nativeElement.value = '';
 
@@ -353,6 +360,7 @@ export class ChatComponent {
 
     try {
       this.socket.emit('message', messagePayload);
+
       this.chatMessages.push(messagePayload);
     } catch (error) {
       console.log('error  ----------?', error);
@@ -385,6 +393,7 @@ export class ChatComponent {
           message_type: MessageType.Location,
           [MessageType.Location]: loc,
           copilot_convo_id: this.copilotConversationId,
+          timestamp: new Date().toISOString(),
         };
         this.sendMessageToAgent(messagePayload);
       },
@@ -417,7 +426,10 @@ export class ChatComponent {
   handleEnterPress(event: KeyboardEvent) {
     if (event.key === 'Enter' && event.shiftKey === false) {
       event.preventDefault();
+
       this.sendMessage();
+      // this.isTyping = false;
+
       this.messageInputText.nativeElement.value = '';
       this.messageInputText.nativeElement.style.height = 'auto';
     }
@@ -523,8 +535,11 @@ export class ChatComponent {
         console.log('chatListT0Agent', this.chatListT0Agent);
 
         // this.socket.emit('message', this.chatListT0Agent);
+        console.log('connecting to agent closing copiloty socket');
+
         this.ws.close();
         this.isAvaya = true;
+
         this.sendInitialMessageAvaya();
       }
 
@@ -604,7 +619,7 @@ export class ChatComponent {
     };
 
     this.ws.onclose = () => {
-      console.log('WebSocket connection closed');
+      console.log('WebSocket connection closed of Copilot');
     };
   }
 
@@ -837,6 +852,7 @@ export class ChatComponent {
       userType: UserType.Customer,
       message_type: MessageType.Text,
       text: 'hi',
+      timestamp: new Date().toISOString(),
     };
     // this.sendMessageToAgent(messagePayload);
     this.socket.emit('message', messagePayload);
@@ -844,11 +860,8 @@ export class ChatComponent {
 
   convertNewlinesToBreaks(text: string): string {
     // console.log('text', text);
-    return   text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    return (text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'));
   }
-
-
-
 
   // openModal(imageUrl: string) {
   //   this.modalImageUrl = imageUrl;
