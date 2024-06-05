@@ -50,6 +50,7 @@ interface BaseMessage {
   message_type: MessageType;
   copilot_convo_id: string;
   timestamp: string;
+  mobileNumber:string;
 }
 
 interface TextMessage extends BaseMessage {
@@ -101,7 +102,7 @@ export interface SuggestedActionsData {
 export interface CopilotAttachmentContentImage {
   url: string;
 }
-export interface CopilotAttachmentMedia{
+export interface CopilotAttachmentMedia {
   url: string;
 }
 

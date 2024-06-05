@@ -299,6 +299,8 @@ export class ChatComponent {
             [MessageType.Image]: fileData,
             copilot_convo_id: this.copilotConversationId,
             timestamp: new Date().toISOString(),
+      mobileNumber:'8888047520'
+
           };
           break;
         case 'audio':
@@ -309,6 +311,8 @@ export class ChatComponent {
             [MessageType.Audio]: fileData,
             copilot_convo_id: this.copilotConversationId,
             timestamp: new Date().toISOString(),
+      mobileNumber:'8888047520'
+
           };
           break;
         case 'video':
@@ -319,6 +323,8 @@ export class ChatComponent {
             [MessageType.Video]: fileData,
             copilot_convo_id: this.copilotConversationId,
             timestamp: new Date().toISOString(),
+      mobileNumber:'8888047520'
+
           };
           break;
 
@@ -330,6 +336,8 @@ export class ChatComponent {
             [MessageType.File]: fileData,
             copilot_convo_id: this.copilotConversationId,
             timestamp: new Date().toISOString(),
+      mobileNumber:'8888047520'
+
           };
       }
       // console.log('messagePayload===> ', messagePayload);
@@ -348,6 +356,8 @@ export class ChatComponent {
       text: this.messageInputText.nativeElement.value,
       copilot_convo_id: this.copilotConversationId,
       timestamp: new Date().toISOString(),
+      mobileNumber:'8888047520'
+
     };
     this.messageInputText.nativeElement.value = '';
 
@@ -394,6 +404,8 @@ export class ChatComponent {
           [MessageType.Location]: loc,
           copilot_convo_id: this.copilotConversationId,
           timestamp: new Date().toISOString(),
+      mobileNumber:'8888047520'
+
         };
         this.sendMessageToAgent(messagePayload);
       },
@@ -840,6 +852,8 @@ export class ChatComponent {
       suggestedActions: data.suggestedActions,
       attachments: attachments,
       attachmentLayout: data.attachment,
+      mobileNumber:'8888047520'
+
     };
 
     return fu;
@@ -853,6 +867,7 @@ export class ChatComponent {
       message_type: MessageType.Text,
       text: 'hi',
       timestamp: new Date().toISOString(),
+      mobileNumber:'8888047520'
     };
     // this.sendMessageToAgent(messagePayload);
     this.socket.emit('message', messagePayload);

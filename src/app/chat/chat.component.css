@@ -22,7 +22,7 @@
   display: flex;
   /* width: 40%;
    */
-   width: 390px;
+  width: 390px;
   right: 2.7rem;
   position: fixed;
   flex-direction: column;
@@ -78,7 +78,7 @@
   justify-content: right;
   /* box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
    */
-   box-shadow: #d2d2d2 0px 8px 24px;
+  box-shadow: #d2d2d2 0px 8px 24px;
   border: 1px solid #cdcdcd;
 }
 
@@ -315,7 +315,6 @@ input {
   width: 100%;
   padding: 0.4rem 0.8rem;
   /* background: #f6f6f6f7; */
-
 }
 
 .text-box:focus {
@@ -325,7 +324,6 @@ input {
 .fileInput :hover {
   background-color: #e9e9e9;
   border-radius: 100%;
-  
 }
 
 @keyframes bounce {
@@ -346,6 +344,9 @@ input {
     /* background: #c7c7f075; */
     z-index: 9999;
   }
+  .popup {
+    /* display: none; */
+  }
 }
 
 .drag-drop-container {
@@ -362,7 +363,7 @@ input {
   position: relative;
   width: 97%;
   border-bottom: 1.5px solid #0b556a6e;
-    border-top: 1.5px solid #b4b4b478;
+  border-top: 1.5px solid #b4b4b478;
 }
 
 .fileInput {
@@ -372,16 +373,15 @@ input {
   border: none;
   background:transparent; */
   display: grid;
-    place-items: center;
-    cursor: pointer;
-    border: none;
-    /* background: transparent; */
-    /* background: white; */
-    padding: 0 .1rem;
+  place-items: center;
+  cursor: pointer;
+  border: none;
+  /* background: transparent; */
+  /* background: white; */
+  padding: 0 0.1rem;
 }
 
 .sendBten {
-  
   padding: 0;
   cursor: pointer;
   margin: 0;
@@ -391,30 +391,26 @@ input {
 .typing-text {
   .material-symbols-outlined {
     color: var(--chat-primary);
-  
 
     font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
   }
-.attachfile{
-  color: black;
-}
- 
+  .attachfile {
+    color: black;
+  }
+
   /* Change to your desired text color */
 }
 .sendBten {
   border-radius: 10px;
-    display: flex;
-    background: white;
-
+  display: flex;
+  background: white;
 }
 .send-icn {
   color: #d7d7d7;
   /* border-radius: 50%;
   padding: .2rem; */
-  padding: 0.2rem .4rem;
-
+  padding: 0.2rem 0.4rem;
 }
-
 
 /* The Modal (background) */
 .modal {
@@ -427,8 +423,8 @@ input {
   width: 100%; /* Full width */
   height: 100%; /* Full height */
   overflow: auto; /* Enable scroll if needed */
-  background-color: rgb(0,0,0); /* Fallback color */
-  background-color: rgba(0,0,0,0.9); /* Black w/ opacity */
+  background-color: rgb(0, 0, 0); /* Fallback color */
+  background-color: rgba(0, 0, 0, 0.9); /* Black w/ opacity */
 }
 
 /* Modal Content (image) */
@@ -456,4 +452,3 @@ input {
   text-decoration: none;
   cursor: pointer;
 }
-

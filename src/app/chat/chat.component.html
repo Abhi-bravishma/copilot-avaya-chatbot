@@ -129,7 +129,15 @@
 
             <div *ngIf="msg.message_type === messageType.Text">
               <div class="message-text" [innerHTML]="msg.text"></div>
-
+              <div
+                class="message-time"
+                [ngClass]="{
+        botcol:msg.userType === typeAgent || msg.userType === typeSystem,
+        cus: msg.userType === typeUser,
+      }"
+              >
+                {{ msg.timestamp | date : "hh:mm a" }}
+              </div>
               <div *ngIf="msg.actions">
                 <span *ngFor="let action of msg.actions">
                   <span *ngIf="action.type === actionType.LocationRequest">
