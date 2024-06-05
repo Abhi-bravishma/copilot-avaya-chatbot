@@ -152,6 +152,8 @@ export class ChatComponent {
   messageTypeCopilot: MessageType.Copilot | undefined;
   copilotToken: any;
   lastMessage: { role: string; msg: string } | null = null;
+  mobileNumber: string | null = null;
+  userName: string = '';
 
   constructor(
     private sanitzer: DomSanitizer,
@@ -293,51 +295,47 @@ export class ChatComponent {
       switch (file.type.split('/')[0]) {
         case 'image':
           messagePayload = {
-            sender: this.sender,
+            sender: this.userName,
             userType: UserType.Customer,
             message_type: MessageType.Image,
             [MessageType.Image]: fileData,
             copilot_convo_id: this.copilotConversationId,
             timestamp: new Date().toISOString(),
-      mobileNumber:'8888047520'
-
+            mobileNumber: this.mobileNumber,
           };
           break;
         case 'audio':
           messagePayload = {
-            sender: this.sender,
+            sender: this.userName,
             userType: UserType.Customer,
             message_type: MessageType.Audio,
             [MessageType.Audio]: fileData,
             copilot_convo_id: this.copilotConversationId,
             timestamp: new Date().toISOString(),
-      mobileNumber:'8888047520'
-
+            mobileNumber: this.mobileNumber,
           };
           break;
         case 'video':
           messagePayload = {
-            sender: this.sender,
+            sender: this.userName,
             userType: UserType.Customer,
             message_type: MessageType.Video,
             [MessageType.Video]: fileData,
             copilot_convo_id: this.copilotConversationId,
             timestamp: new Date().toISOString(),
-      mobileNumber:'8888047520'
-
+            mobileNumber: this.mobileNumber,
           };
           break;
 
         default:
           messagePayload = {
-            sender: this.sender,
+            sender: this.userName,
             userType: UserType.Customer,
             message_type: MessageType.File,
             [MessageType.File]: fileData,
             copilot_convo_id: this.copilotConversationId,
             timestamp: new Date().toISOString(),
-      mobileNumber:'8888047520'
-
+            mobileNumber: this.mobileNumber,
           };
       }
       // console.log('messagePayload===> ', messagePayload);
@@ -350,14 +348,13 @@ export class ChatComponent {
     if (!this.messageInputText.nativeElement.value) return;
     console.log('send text called');
     let messagePayload: Message = {
-      sender: this.sender,
+      sender: this.userName,
       userType: UserType.Customer,
       message_type: MessageType.Text,
       text: this.messageInputText.nativeElement.value,
       copilot_convo_id: this.copilotConversationId,
       timestamp: new Date().toISOString(),
-      mobileNumber:'8888047520'
-
+      mobileNumber: this.mobileNumber,
     };
     this.messageInputText.nativeElement.value = '';
 
@@ -398,14 +395,13 @@ export class ChatComponent {
           url: mapUrl,
         };
         const messagePayload: Message = {
-          sender: this.sender,
+          sender: this.userName,
           userType: UserType.Customer,
           message_type: MessageType.Location,
           [MessageType.Location]: loc,
           copilot_convo_id: this.copilotConversationId,
           timestamp: new Date().toISOString(),
-      mobileNumber:'8888047520'
-
+          mobileNumber: this.mobileNumber,
         };
         this.sendMessageToAgent(messagePayload);
       },
@@ -507,16 +503,34 @@ export class ChatComponent {
         this.chatMessages.push(serializeData);
       }
 
+      if (eventData?.activities[0].type === 'event') {
+        console.log('wtf======== > ', eventData?.activities[0]);
+        console.log('wtf======== > ', eventData?.activities[0].name);
+      }
+
       if (
         eventData?.activities[0].type === 'event' &&
-        eventData?.activities[0].value === 'connectToAgent'
+        // eventData?.activities[0].value === 'connectToAgent'
+        eventData?.activities[0].name === 'connectToAgent'
       ) {
+        console.log('--------------------------------------------------------');
+
         console.log(
-          'wtf--> ',
+          'wtf--> name',
+          eventData?.activities[0].name,
+          'type=> ',
           eventData?.activities[0].type,
-          ' ----- ',
+          ' val=> ',
           eventData?.activities[0].value
         );
+        let uName = eventData?.activities[0]?.value[0];
+        let uMob = eventData?.activities[0]?.value[1];
+        this.userName = uName;
+        this.mobileNumber = uMob;
+
+        console.log('==========================');
+        console.log(this.userName, this.mobileNumber);
+        console.log('==========================');
         // this.sendText();
         //   this.chatListT0Agent.push(eventData?.activities[0].from);
         //   console.log('connectToAgentUrl', this.chatListT0Agent)
@@ -852,8 +866,7 @@ export class ChatComponent {
       suggestedActions: data.suggestedActions,
       attachments: attachments,
       attachmentLayout: data.attachment,
-      mobileNumber:'8888047520'
-
+      mobileNumber: this.mobileNumber,
     };
 
     return fu;
@@ -862,12 +875,12 @@ export class ChatComponent {
   sendInitialMessageAvaya() {
     let messagePayload: Message = {
       copilot_convo_id: this.copilotConversationId,
-      sender: this.sender,
+      sender: this.userName,
       userType: UserType.Customer,
       message_type: MessageType.Text,
       text: 'hi',
       timestamp: new Date().toISOString(),
-      mobileNumber:'8888047520'
+      mobileNumber: this.mobileNumber,
     };
     // this.sendMessageToAgent(messagePayload);
     this.socket.emit('message', messagePayload);

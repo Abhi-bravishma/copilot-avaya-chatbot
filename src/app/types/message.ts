@@ -50,7 +50,7 @@ interface BaseMessage {
   message_type: MessageType;
   copilot_convo_id: string;
   timestamp: string;
-  mobileNumber:string;
+  mobileNumber: string | null;
 }
 
 interface TextMessage extends BaseMessage {
