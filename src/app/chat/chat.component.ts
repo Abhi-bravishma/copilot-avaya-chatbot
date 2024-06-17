@@ -12,7 +12,7 @@ import { Subject } from 'rxjs';
 import { DomSanitizer } from '@angular/platform-browser';
 import { AdaptiveCard, HostConfig } from 'adaptivecards';
 import { Socket } from 'ngx-socket-io';
-
+import * as microsoftTeams from '@microsoft/teams-js';
 import {
   Message,
   MessageType,
@@ -113,6 +113,7 @@ export class ChatComponent {
   isTyping: boolean = false;
   popUpOpenClose: boolean = false;
   popUpOpenopen: boolean = true;
+  locale:any
 
   popUp = false;
   image: File | null = null;
@@ -167,6 +168,15 @@ export class ChatComponent {
   }
 
   async ngOnInit() {
+    this.locale = this.getBrowserLocale();
+    console.log("locale",this.locale);
+    microsoftTeams.initialize();
+
+    microsoftTeams.getContext((context) => {
+      // Use the context if needed
+      console.log('Teams Context:', context);
+    });
+    
     // this.tokenService.getToken().subscribe(
     //   (data: any) => {
     //     // Assuming the response has a 'token' field
@@ -467,7 +477,7 @@ export class ChatComponent {
 
       // this.chatList.push(JSON.parse(event.data)['activities'][0]);
       let eventData = event.data ? JSON.parse(event.data) : null;
-      // console.log('eventData', eventData);
+      console.log('eventData', eventData);
 
       if (eventData && eventData?.activities[0]?.attachments?.length > 0) {
         let acData = eventData?.activities[0]?.attachments[0];
@@ -710,6 +720,8 @@ export class ChatComponent {
         // 'Bearer J4F_EVyzGL0.RJf4LF_6Oiue88wdXeYqSn9iWJg2f64LGVPsiG2QPxw', //beyond bank,
 
         // 'Bearer 6mJ1ECPC0dk.hunFtodVEt72En-mSOwQiSLcBabsgjK_zwLVeAYq6U8', //University AI Copilot,
+        // 'Bearer s5EUdS1eF4E.EjddkK2hY57o-oIHH8r_mChAe9MQAK6OiOpCq9QCvB4', //University AI Copilot,
+
 
         `Bearer ${copilotToken}`, //copy bot
     };
@@ -740,7 +752,9 @@ export class ChatComponent {
     };
 
     let bodyContent = JSON.stringify({
-      locale: 'en-EN',
+      // locale: 'en-EN',
+      locale: this.locale,
+
       type: 'message',
       value: this.rating,
 
@@ -777,6 +791,10 @@ export class ChatComponent {
       };
       let bodyContent = JSON.stringify({
         name: 'startConversation',
+        // locale: 'ja',
+        locale: this.locale,
+
+
         type: 'event',
         from: {
           id: '5839aa31-0a18-4ae6-bf9a-074b29de79b3',
@@ -898,4 +916,19 @@ export class ChatComponent {
   // closeModal() {
   //   this.modalImageUrl = null;
   // }
+
+
+  getBrowserLocale(): string {
+    const language = navigator.language || (navigator as any).userLanguage;
+    console.log(" return language.startsWith('ja') ? 'ja' : 'en-EN';",language.startsWith('ja') ? 'ja-JP' : 'en-EN');
+
+    return language.startsWith('ja') ? 'ja' : 'en-EN';
+    
+  }
+
+  closeTaskModule(): void {
+    microsoftTeams.tasks.submitTask();
+  }
+  
+
 }
