@@ -906,7 +906,10 @@ export class ChatComponent {
 
   convertNewlinesToBreaks(text: string): string {
     // console.log('text', text);
-    return (text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'));
+    // return (text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'));
+    return (text.replace(/\n/g, '<br/>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'));
+
+    // return text.replace(/\n/g, '<br/>');
   }
 
   // openModal(imageUrl: string) {
