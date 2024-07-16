@@ -113,7 +113,7 @@ export class ChatComponent {
   isTyping: boolean = false;
   popUpOpenClose: boolean = false;
   popUpOpenopen: boolean = true;
-  locale:any
+  locale: any;
 
   popUp = false;
   image: File | null = null;
@@ -169,14 +169,14 @@ export class ChatComponent {
 
   async ngOnInit() {
     this.locale = this.getBrowserLocale();
-    console.log("locale",this.locale);
+    console.log('locale', this.locale);
     microsoftTeams.initialize();
 
     microsoftTeams.getContext((context) => {
       // Use the context if needed
       console.log('Teams Context:', context);
     });
-    
+
     // this.tokenService.getToken().subscribe(
     //   (data: any) => {
     //     // Assuming the response has a 'token' field
@@ -722,7 +722,6 @@ export class ChatComponent {
         // 'Bearer 6mJ1ECPC0dk.hunFtodVEt72En-mSOwQiSLcBabsgjK_zwLVeAYq6U8', //University AI Copilot,
         // 'Bearer s5EUdS1eF4E.EjddkK2hY57o-oIHH8r_mChAe9MQAK6OiOpCq9QCvB4', //University AI Copilot,
 
-
         `Bearer ${copilotToken}`, //copy bot
     };
 
@@ -793,7 +792,6 @@ export class ChatComponent {
         name: 'startConversation',
         // locale: 'ja',
         locale: this.locale,
-
 
         type: 'event',
         from: {
@@ -906,7 +904,12 @@ export class ChatComponent {
 
   convertNewlinesToBreaks(text: string): string {
     // console.log('text', text);
-    return (text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'));
+    // return (text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'));
+    return text
+      .replace(/\n/g, '<br/>')
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+    // return text.replace(/\n/g, '<br/>');
   }
 
   // openModal(imageUrl: string) {
@@ -917,18 +920,17 @@ export class ChatComponent {
   //   this.modalImageUrl = null;
   // }
 
-
   getBrowserLocale(): string {
     const language = navigator.language || (navigator as any).userLanguage;
-    console.log(" return language.startsWith('ja') ? 'ja' : 'en-EN';",language.startsWith('ja') ? 'ja-JP' : 'en-EN');
+    console.log(
+      " return language.startsWith('ja') ? 'ja' : 'en-EN';",
+      language.startsWith('ja') ? 'ja-JP' : 'en-EN'
+    );
 
     return language.startsWith('ja') ? 'ja' : 'en-EN';
-    
   }
 
   closeTaskModule(): void {
     microsoftTeams.tasks.submitTask();
   }
-  
-
 }
